@@ -77,17 +77,17 @@ Conventions:
 
 ## Acceptance criteria
 
-- [ ] `index.html` carga sin errores en la consola del navegador.
-- [ ] Las flechas izquierda/derecha mueven la pala sin que salga del canvas.
-- [ ] La bola rebota correctamente en paredes y pala.
-- [ ] Romper un bloque lo elimina y suma los puntos correspondientes a su color.
-- [ ] Perder la bola resta exactamente una vida.
-- [ ] Al llegar a 0 vidas se muestra la pantalla de Game Over.
-- [ ] Al romper todos los bloques se muestra la pantalla de victoria.
-- [ ] Pulsar `Esc` o `P` durante la partida pausa el juego y muestra un overlay; volver a pulsarla reanuda.
-- [ ] Al terminar una partida con puntuación mayor al high score guardado, el nuevo valor se persiste en `localStorage` bajo la clave `arkanoid:highscore:v1`.
-- [ ] Recargar la página después de superar el high score muestra el valor actualizado.
-- [ ] Desde la pantalla de Game Over o de victoria es posible reiniciar la partida.
+- [x] `index.html` carga sin errores en la consola del navegador.
+- [x] Las flechas izquierda/derecha mueven la pala sin que salga del canvas.
+- [x] La bola rebota correctamente en paredes y pala.
+- [x] Romper un bloque lo elimina y suma los puntos correspondientes a su color.
+- [x] Perder la bola resta exactamente una vida.
+- [x] Al llegar a 0 vidas se muestra la pantalla de Game Over.
+- [x] Al romper todos los bloques se muestra la pantalla de victoria.
+- [x] Pulsar `Esc` o `P` durante la partida pausa el juego y muestra un overlay; volver a pulsarla reanuda.
+- [x] Al terminar una partida con puntuación mayor al high score guardado, el nuevo valor se persiste en `localStorage` bajo la clave `arkanoid:highscore:v1`.
+- [x] Recargar la página después de superar el high score muestra el valor actualizado.
+- [x] Desde la pantalla de Game Over o de victoria es posible reiniciar la partida.
 
 ---
 
