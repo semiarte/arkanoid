@@ -12,6 +12,15 @@ const BLOCK_HEIGHT = 20;
 const BLOCK_COLS = 10;
 const BLOCK_TOP = 40;
 
+const sounds = {
+  bounce: new Audio( 'assets/sounds/ball-bounce.mp3' ),
+  break: new Audio( 'assets/sounds/break-sound.mp3' ),
+};
+
+function playSound( audio ) {
+  audio.cloneNode().play();
+}
+
 const state = {
   screen: 'playing', // 'start' | 'playing' | 'paused' | 'gameover' | 'win' | 'exploding'
   score: 0,
@@ -113,14 +122,17 @@ function updateBall() {
   if ( ball.x - ball.radius < 0 ) {
     ball.x = ball.radius;
     ball.dx = -ball.dx;
+    playSound( sounds.bounce );
   } else if ( ball.x + ball.radius > canvas.width ) {
     ball.x = canvas.width - ball.radius;
     ball.dx = -ball.dx;
+    playSound( sounds.bounce );
   }
 
   if ( ball.y - ball.radius < 0 ) {
     ball.y = ball.radius;
     ball.dy = -ball.dy;
+    playSound( sounds.bounce );
   }
 
   bounceOffPaddle();
@@ -171,6 +183,7 @@ function bounceOffBlocks() {
 
     block.alive = false;
     state.score += BLOCK_POINTS[ block.color ];
+    playSound( sounds.break );
     state.explosions.push( {
       x: block.x,
       y: block.y,
@@ -216,6 +229,7 @@ function bounceOffPaddle() {
 
   ball.y = paddle.y - ball.radius;
   ball.dy = -ball.dy;
+  playSound( sounds.bounce );
 
   const hitPoint = ( ball.x - ( paddle.x + paddle.width / 2 ) ) / ( paddle.width / 2 );
   const speed = Math.hypot( ball.dx, ball.dy );
