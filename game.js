@@ -6,11 +6,30 @@ const ctx = canvas.getContext( '2d' );
 const HIGH_SCORE_KEY = 'arkanoid:highscore:v1';
 
 const BLOCK_POINTS = { gray: 10, red: 20, yellow: 30, cyan: 40, magenta: 50, hotpink: 60, green: 70 };
-const BLOCK_ROWS = [ 'gray', 'red', 'yellow', 'cyan', 'magenta', 'hotpink', 'green' ];
 const BLOCK_WIDTH = 48;
 const BLOCK_HEIGHT = 20;
 const BLOCK_COLS = 10;
 const BLOCK_TOP = 40;
+
+// Cada nivel es un array de filas; cada fila es un array de BLOCK_COLS colores (o null = sin bloque).
+const LEVELS = [
+  // Nivel 1: grid completo, igual al nivel único de SPEC 01.
+  [ 'gray', 'red', 'yellow', 'cyan', 'magenta', 'hotpink', 'green' ].map(
+    ( color ) => new Array( BLOCK_COLS ).fill( color )
+  ),
+  // Nivel 2: pirámide invertida, se achica hacia abajo.
+  [ 'green', 'hotpink', 'magenta', 'cyan', 'yellow', 'red', 'gray' ].map(
+    ( color, row ) => new Array( BLOCK_COLS ).fill( null ).map(
+      ( _, col ) => ( col >= row && col < BLOCK_COLS - row ) ? color : null
+    )
+  ),
+  // Nivel 3: tablero de ajedrez por columnas alternas.
+  [ 'magenta', 'cyan', 'hotpink', 'green', 'red', 'yellow', 'gray' ].map(
+    ( color, row ) => new Array( BLOCK_COLS ).fill( null ).map(
+      ( _, col ) => ( ( row + col ) % 2 === 0 ) ? color : null
+    )
+  ),
+];
 
 const sounds = {
   bounce: new Audio( 'assets/sounds/ball-bounce.mp3' ),
@@ -25,26 +44,30 @@ const state = {
   screen: 'playing', // 'start' | 'playing' | 'paused' | 'gameover' | 'win' | 'exploding'
   score: 0,
   lives: 3,
+  level: 1, // 1 | 2 | 3, 1-indexado; LEVELS[state.level - 1] es el layout activo
   highScore: Number( localStorage.getItem( HIGH_SCORE_KEY ) ) || 0,
   paddle: { x: 200, y: 600, width: 80, height: 16, speed: 6 },
   ball: { x: 240, y: 300, radius: 8, dx: 3, dy: -3 },
-  blocks: createBlocks(),
+  blocks: [],
   explosions: [], // { x, y, width, height, color, startTime }
 };
+state.blocks = createBlocks();
 
 function createBlocks() {
+  const layout = LEVELS[ state.level - 1 ];
   const blocks = [];
-  BLOCK_ROWS.forEach( ( color, row ) => {
-    for ( let col = 0; col < BLOCK_COLS; col++ ) {
+  layout.forEach( ( row, rowIndex ) => {
+    row.forEach( ( color, col ) => {
+      if ( !color ) return;
       blocks.push( {
         x: col * BLOCK_WIDTH,
-        y: BLOCK_TOP + row * BLOCK_HEIGHT,
+        y: BLOCK_TOP + rowIndex * BLOCK_HEIGHT,
         width: BLOCK_WIDTH,
         height: BLOCK_HEIGHT,
         color,
         alive: true,
       } );
-    }
+    } );
   } );
   return blocks;
 }
@@ -66,6 +89,10 @@ window.addEventListener( 'keydown', ( e ) => {
     restartGame();
   }
 
+  if ( state.screen === 'levelcomplete' && e.key.toLowerCase() === 'r' ) {
+    advanceLevel();
+  }
+
   if ( e.key === 'Escape' || e.key.toLowerCase() === 'p' ) {
     togglePause();
   }
@@ -82,6 +109,15 @@ function togglePause() {
 function restartGame() {
   state.score = 0;
   state.lives = 3;
+  state.level = 1;
+  state.blocks = createBlocks();
+  state.explosions = [];
+  resetBallAndPaddle();
+  state.screen = 'playing';
+}
+
+function advanceLevel() {
+  state.level += 1;
   state.blocks = createBlocks();
   state.explosions = [];
   resetBallAndPaddle();
@@ -92,7 +128,7 @@ function update() {
   if ( state.screen === 'exploding' ) {
     updateExplosions();
     if ( state.explosions.length === 0 ) {
-      state.screen = 'win';
+      state.screen = state.level < LEVELS.length ? 'levelcomplete' : 'win';
     }
     return;
   }
@@ -260,12 +296,15 @@ function draw() {
   ctx.font = '16px sans-serif';
   ctx.fillText( `Score: ${ state.score }`, 10, 20 );
   ctx.fillText( `High: ${ state.highScore }`, canvas.width / 2 - 30, 20 );
+  ctx.fillText( `Nivel ${ state.level }/${ LEVELS.length }`, canvas.width / 2 + 60, 20 );
   drawLives();
 
   if ( state.screen === 'gameover' ) {
     drawOverlay( 'GAME OVER', 'Pulsa R para reiniciar' );
   } else if ( state.screen === 'win' ) {
     drawOverlay( '¡VICTORIA!', 'Pulsa R para reiniciar' );
+  } else if ( state.screen === 'levelcomplete' ) {
+    drawOverlay( `Nivel ${ state.level } completado`, 'Pulsa R para continuar' );
   } else if ( state.screen === 'paused' ) {
     drawOverlay( 'Pausado', 'Pulsa Esc o P para continuar' );
   }

@@ -1,6 +1,6 @@
 # SPEC 04 — Niveles progresivos
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01, SPEC 02
 > **Date:** 2026-10-27
 > **Objective:** Al romper todos los bloques de un nivel, el juego avanza al siguiente nivel (de 3 predefinidos) conservando vidas y puntuación, en vez de terminar la partida.
@@ -65,14 +65,14 @@ Conventions:
 
 ## Acceptance criteria
 
-- [ ] Existen 3 niveles con layouts de bloques distintos entre sí.
-- [ ] Al romper todos los bloques del nivel 1 o 2, se muestra un overlay "Nivel X completado" en vez de la pantalla de victoria.
-- [ ] Pulsar la tecla de continuar en `levelcomplete` carga el siguiente nivel con bola y pala reposicionadas, conservando vidas y puntuación acumuladas.
-- [ ] El HUD muestra el nivel actual durante la partida.
-- [ ] Al romper todos los bloques del nivel 3 (último), se muestra la pantalla de victoria final, no un overlay de nivel completado.
-- [ ] Perder todas las vidas en cualquier nivel muestra Game Over, igual que antes (el nivel no afecta esta condición).
-- [ ] Reiniciar la partida desde Game Over o victoria vuelve siempre al nivel 1 con vidas y score en sus valores iniciales.
-- [ ] El high score se sigue actualizando en `localStorage` con la puntuación final acumulada de la partida (no por nivel individual).
+- [x] Existen 3 niveles con layouts de bloques distintos entre sí.
+- [x] Al romper todos los bloques del nivel 1 o 2, se muestra un overlay "Nivel X completado" en vez de la pantalla de victoria.
+- [x] Pulsar la tecla de continuar en `levelcomplete` carga el siguiente nivel con bola y pala reposicionadas, conservando vidas y puntuación acumuladas.
+- [x] El HUD muestra el nivel actual durante la partida.
+- [x] Al romper todos los bloques del nivel 3 (último), se muestra la pantalla de victoria final, no un overlay de nivel completado.
+- [x] Perder todas las vidas en cualquier nivel muestra Game Over, igual que antes (el nivel no afecta esta condición).
+- [x] Reiniciar la partida desde Game Over o victoria vuelve siempre al nivel 1 con vidas y score en sus valores iniciales.
+- [x] El high score se sigue actualizando en `localStorage` con la puntuación final acumulada de la partida (no por nivel individual).
 
 ---
 
