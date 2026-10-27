@@ -1,6 +1,6 @@
 # SPEC 01 — MVP del juego Arkanoid
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** (ninguno)
 > **Date:** 2026-10-18
 > **Objective:** Jugar una partida completa de Arkanoid en el navegador: mover la pala con el teclado, romper un único nivel de bloques, perder vidas, pausar, y ver pantallas de victoria/derrota con el high score guardado en localStorage.

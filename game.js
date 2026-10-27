@@ -13,13 +13,14 @@ const BLOCK_COLS = 10;
 const BLOCK_TOP = 40;
 
 const state = {
-  screen: 'playing', // 'start' | 'playing' | 'paused' | 'gameover' | 'win'
+  screen: 'playing', // 'start' | 'playing' | 'paused' | 'gameover' | 'win' | 'exploding'
   score: 0,
   lives: 3,
   highScore: Number( localStorage.getItem( HIGH_SCORE_KEY ) ) || 0,
   paddle: { x: 200, y: 600, width: 80, height: 16, speed: 6 },
   ball: { x: 240, y: 300, radius: 8, dx: 3, dy: -3 },
   blocks: createBlocks(),
+  explosions: [], // { x, y, width, height, color, startTime }
 };
 
 function createBlocks() {
@@ -73,11 +74,20 @@ function restartGame() {
   state.score = 0;
   state.lives = 3;
   state.blocks = createBlocks();
+  state.explosions = [];
   resetBallAndPaddle();
   state.screen = 'playing';
 }
 
 function update() {
+  if ( state.screen === 'exploding' ) {
+    updateExplosions();
+    if ( state.explosions.length === 0 ) {
+      state.screen = 'win';
+    }
+    return;
+  }
+
   if ( state.screen !== 'playing' ) return;
 
   const paddle = state.paddle;
@@ -86,6 +96,13 @@ function update() {
   paddle.x = Math.max( 0, Math.min( canvas.width - paddle.width, paddle.x ) );
 
   updateBall();
+  updateExplosions();
+}
+
+function updateExplosions() {
+  state.explosions = state.explosions.filter( ( explosion ) => {
+    return performance.now() - explosion.startTime < EXPLOSION_DURATION * 4;
+  } );
 }
 
 function updateBall() {
@@ -154,9 +171,17 @@ function bounceOffBlocks() {
 
     block.alive = false;
     state.score += BLOCK_POINTS[ block.color ];
+    state.explosions.push( {
+      x: block.x,
+      y: block.y,
+      width: block.width,
+      height: block.height,
+      color: block.color,
+      startTime: performance.now(),
+    } );
 
     if ( state.blocks.every( ( b ) => !b.alive ) ) {
-      state.screen = 'win';
+      state.screen = 'exploding';
       saveHighScore();
     }
 
@@ -209,6 +234,12 @@ function draw() {
   state.blocks.forEach( ( block ) => {
     if ( !block.alive ) return;
     drawSprite( ctx, `block_${ block.color }`, block.x, block.y, block.width, block.height );
+  } );
+
+  state.explosions.forEach( ( explosion ) => {
+    const frameIndex = Math.floor( ( performance.now() - explosion.startTime ) / EXPLOSION_DURATION );
+    const frame = EXPLOSION_FRAMES[ explosion.color ][ Math.min( frameIndex, 3 ) ];
+    drawFrame( ctx, frame, explosion.x, explosion.y, explosion.width, explosion.height );
   } );
 
   ctx.fillStyle = 'white';
